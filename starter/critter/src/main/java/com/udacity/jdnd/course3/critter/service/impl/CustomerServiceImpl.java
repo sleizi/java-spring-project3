@@ -28,8 +28,27 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDTO saveCustomer(CustomerDTO customerDTO) {
-        Customer savedCustomer = customerRepository.save(mapper.customerDTOToCustomer(customerDTO));
-        return mapper.customerToCustomerDTO(savedCustomer);
+
+        Customer customer = mapper.customerDTOToCustomer(customerDTO);
+        List<Pet> pets = new ArrayList<>();
+        List<Long> petIds = customerDTO.getPetIds();
+        if (petIds != null) {
+            for (Long petId : petIds) {
+                Pet pet = petRepository.findById(petId).orElse(null);
+                if (pet != null) {
+                    pets.add(pet);
+                } else {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet does not exist");
+                }
+            }
+        }
+
+        customer.setPets(pets);
+        Customer savedCustomer = customerRepository.save(customer);
+
+        CustomerDTO result = mapper.customerToCustomerDTO(savedCustomer);
+        result.setPetIds(petIds);
+        return result;
     }
 
     @Override
@@ -37,7 +56,16 @@ public class CustomerServiceImpl implements CustomerService {
         List<Customer> customers = customerRepository.findAll();
         List<CustomerDTO> result = new ArrayList<>();
         for (Customer customer : customers) {
-            result.add(mapper.customerToCustomerDTO(customer));
+            CustomerDTO customerDTO = mapper.customerToCustomerDTO(customer);
+            List<Long> petIds = new ArrayList<>();
+
+            List<Pet> pets = customer.getPets();
+            for (Pet pet : pets
+            ) {
+                petIds.add(pet.getId());
+            }
+            customerDTO.setPetIds(petIds);
+            result.add(customerDTO);
         }
         return result;
     }

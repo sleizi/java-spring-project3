@@ -12,9 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,12 +28,16 @@ public class PetServiceImpl implements PetService {
     private final MapStructMapper mapper;
 
     @Override
+    @Transactional
     public PetDTO savePet(PetDTO petDTO) {
         Pet pet = mapper.petDTOToPet(petDTO);
-        Optional<Customer> customer = customerRepository.findById(petDTO.getOwnerId());
-        if (customer.isPresent()) {
-            pet.setCustomer(customer.get());
+        Customer customer = customerRepository.findById(petDTO.getOwnerId()).orElse(null);
+        if (customer != null) {
+            pet.setCustomer(customer);
             PetDTO result = mapper.petToPetDTO(petRepository.save(pet));
+            List<Pet> pets = customer.getPets();
+            pets.add(pet);
+            customer.setPets(pets);
             result.setOwnerId(petDTO.getOwnerId());
             return result;
         } else {

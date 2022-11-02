@@ -1,5 +1,6 @@
 package com.udacity.jdnd.course3.critter.entity;
 
+import com.google.common.base.Objects;
 import com.udacity.jdnd.course3.critter.user.EmployeeSkill;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.DayOfWeek;
-import java.util.Objects;
 import java.util.Set;
 
 @Table
@@ -39,13 +39,14 @@ public class Employee implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Employee)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Employee employee = (Employee) o;
-        return Objects.equals(id, employee.id) && Objects.equals(name, employee.name) && Objects.equals(skills, employee.skills) && Objects.equals(daysAvailable, employee.daysAvailable);
+        return id == employee.id && Objects.equal(name, employee.name) && Objects.equal(skills, employee.skills) && Objects.equal(daysAvailable, employee.daysAvailable);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, skills, daysAvailable);
+        return Objects.hashCode(id, name, skills, daysAvailable);
     }
+
 }

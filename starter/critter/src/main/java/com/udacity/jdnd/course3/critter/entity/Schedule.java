@@ -1,5 +1,6 @@
 package com.udacity.jdnd.course3.critter.entity;
 
+import com.google.common.base.Objects;
 import com.udacity.jdnd.course3.critter.user.EmployeeSkill;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,6 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Table
@@ -46,14 +46,13 @@ public class Schedule implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Schedule)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Schedule schedule = (Schedule) o;
-        return Objects.equals(id, schedule.id) && Objects.equals(employees, schedule.employees) && Objects.equals(pets, schedule.pets) && Objects.equals(date, schedule.date) && Objects.equals(activities, schedule.activities);
+        return id == schedule.id && Objects.equal(employees, schedule.employees) && Objects.equal(pets, schedule.pets) && Objects.equal(date, schedule.date) && Objects.equal(activities, schedule.activities);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, employees, pets, date, activities);
+        return Objects.hashCode(id, employees, pets, date, activities);
     }
-
 }
